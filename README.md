@@ -64,11 +64,11 @@ The mappings mentioned above are not provided with the code here, but rather pul
 
 which contain plenty of additional information, that may be useful for further custom scripting. Good stuff.
 
-## Requirements
+## Requirements and pre-compiled binaries
 
-The repo here does **currently not** contain any pre-compiled binaries (e.g. .exe files).
+I might try some example workflows to build and release some binaries (e.g. .exe files) for this repo using `pyInstall` and github actions. This comes with no warranty whatsoever, in case I give this a try testing that feature. If you should ever decide to run such a binary from a release download, it will attempt to create the `./download/` and `./io/` folders in whichever directory you run the executable. Then just copy your hg files to `./io/` and run the binary again. Maybe it will work, that remains to be seen.
 
-The functions of the parser use standard libraries only. However, they rely on the included `nmssavetool.py`'s decompress function, which depends on the `lz4` package. A `requirements.txt` with just one line for this single dependency may look like a joke. But if you add more for your own experiments, it may help to refresh it e.g. with a `pip freeze > requirements.txt` on your venv.
+Though, I do recommend to just run the script in a python environment. The functions of the parser use standard libraries only. However, they rely on the included `nmssavetool.py`'s decompress function, which depends on the `lz4` package. You can ignore `pyInstall` in the `requirements.txt`, although it should do no harm when creating a venv.
 
 ## If you are new to python
 
@@ -82,11 +82,11 @@ In a nut shell:
 * open the (unzipped) folder in your IDE (e.g. in VS Code)
 * create a venv (e.g. Ctrl+Shift+P, create environment)
 * install packages there (e.g. `pip install` in a terminal)
-* run `main.py` (e.g. button or `py .` in a terminal)
+* run `__main__.py` (e.g. button or `py .` in a terminal)
 
 ## Inspirations and honourable mentions
 
-I started this small experiment after exploring some sources and database bits of modding tools like the awesome [NMSSaveEditor by goatfungus](https://github.com/goatfungus/NMSSaveEditor). I wondered if the feature to export a json could be replicated in a simple manner and found a charmingly whacky workaround in the form of [lenny009's NMS-Save-Decoder](https://github.com/NMSCD/NMS-Save-Decoder). Cool, I thought, wrapping this up in python could be a nice exercise, so that it gets super convenient to analyse the save, for example like [nms-weasel's base part count](https://github.com/weasel-nms/NMS-base-part-count/tree/main) does. Well, here we are. I hope it will be useful for some of you NMS nerds out there.
+I started this small experiment after exploring some sources and database bits of modding tools like the awesome [NMSSaveEditor by goatfungus](https://github.com/goatfungus/NMSSaveEditor). I wondered if the feature to export a json could be replicated in a simple manner and found a charmingly hacky workaround in the form of [lenny009's NMS-Save-Decoder](https://github.com/NMSCD/NMS-Save-Decoder). Cool, I thought, wrapping this up in python could be a nice exercise, so that it gets super convenient to analyse the save, for example like [nms-weasel's base part count](https://github.com/weasel-nms/NMS-base-part-count/tree/main) does. Well, here we are. I hope it will be useful for some of you NMS nerds out there.
 
 Cheers and happy exploring, DrBonifarz
 
@@ -98,3 +98,4 @@ Cheers and happy exploring, DrBonifarz
 4. [NMSSaveEditor by goatfungus](https://github.com/goatfungus/NMSSaveEditor)
 5. [lenny009's NMS-Save-Decoder](https://github.com/NMSCD/NMS-Save-Decoder)
 6. [nms-weasel's base part count](https://github.com/weasel-nms/NMS-base-part-count/tree/main)
+7. [some example workflow by Rahul Suryavamshi, just in case](https://dev.to/rahul_suryash/steps-to-build-binary-executables-for-python-code-with-github-actions-4k92)
