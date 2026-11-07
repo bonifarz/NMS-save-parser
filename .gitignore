@@ -1,0 +1,6 @@
+#exclude the following folders or subfolders from source control:
+.venv/
+__pycache__/
+bak/
+io/
+download/
