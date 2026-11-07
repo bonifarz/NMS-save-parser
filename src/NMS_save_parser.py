@@ -34,18 +34,18 @@ class save_parser_class:
         writeFile(self.fn+".obfuscated.json", decompress(readFile(self.fn))) 
         # apply the name mapping to the decompressed save data:
         self.save = self.apply_mapping(decompress(readFile(self.fn)))
+        self.write_save_json()
         # define the prefixes for all following output files below:
         self.fn += "."+self.save["CommonStateData"]["SaveName"]
         self.fn += "."+str(self.save["CommonStateData"]["TotalPlayTime"])
         # here you can select (and add your own) data parsing steps as needed:
-        self.write_save_json()
         self.parse_inventory()
         self.parse_bases()
         self.parse_discoveries()
 
     def write_save_json(self):
         """Store the save data in a long json format."""
-        fno = self.fn+".json"
+        fno = self.fn+".long.json"
         f = open(fno, "w", encoding="ansi")
         f.write(json.dumps(self.save, indent=2))
         f.close

@@ -4,7 +4,7 @@ This lightweight python script parses save data from NO MANS SKY (NMS) and extra
 
 ## File inputs
 
-This script will read any NMS saves (.hg files) that you copy to the `./io/` folder here. This is not meant to edit or recompress any save data. You just copy the files for convenience of batch processing.
+This script will read any NMS saves (.hg files) that you copy to the `./io/` folder. This is not meant to edit or recompress any save data. You just copy the files for convenience of batch processing.
 
 If you do not know where your saves are on windows, copy the below text and then press Win+E, Ctrl+L, Ctrl+V, Enter.
 ```
@@ -22,14 +22,7 @@ The script reads and transforms the save data to gather some statistics and deta
 * `discoveries.tsv` - stats from your discovery manager,
 * `discoverydata.tsv` - who discovered what, where and when in there.
 
-They can be imported to your favourite spreadsheet or BI software. Or simply put: Just copy-paste the text to work with the tables.
-
-The script also generates json files that contain the full content of the save data. These are not necessary and their creation steps can be commented out.
-
-* `long.json` - full content of the save in a readable format,
-* `obfuscated.json` - for curiosity only, as explained in the next section.
-
-Each of the above files is written (or overwritten) in the  `./io/` folder with the following prefixes, 
+The files can be imported to your favourite spreadsheet or BI software. Or simply put: Just copy-paste the text to work with the tables. Each of the above files is written (or overwritten) in the  `./io/` folder with the following prefixes, 
 * the input file name,
 * the save slot name and
 * the playtime in seconds,
@@ -37,6 +30,11 @@ Each of the above files is written (or overwritten) in the  `./io/` folder with 
 for example `save3.hg.iHatePermaDeath.71180.inventoryslots.tsv`.
 
 This may be neat in case you want to compare different saves or their history. If you prefer another naming convention, the script should be easy to adapt.
+
+The script also generates json files that contain the full content of the save data. These are not necessary and their creation steps can be commented out.
+
+* `long.json` - full content of the save in a readable format,
+* `obfuscated.json` - for curiosity only, as explained in the next section.
 
 ## What this script does
 
