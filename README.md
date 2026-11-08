@@ -66,15 +66,15 @@ The `download` files also include the mentioned `mapping.json` and a copy of thi
 
 If these files are kept, the script runs fine offline.
 
-## Requirements and pre-compiled binaries
+## Requirements and release binaries
 
-I might try some example workflows to build and release some binaries (e.g. .exe files) for this repo using `pyInstall` and github actions. This comes with no warranty whatsoever, in case I give this a try testing that feature. If you should ever decide to run such a binary from a release download, it will attempt to create the `./download/` and `./io/` folders in whichever directory you run the executable. Then just copy your hg files to `./io/` and run the binary again. Maybe it will work, that remains to be seen.
+If you just want to test the functionality of the script without installing python, you could try some binaries (e.g. .exe files) that were built using `pyInstall` and github actions. These come with no warranty whatsoever. If you should decide to run such a binary file from a [release download](https://github.com/bonifarz/NMS-save-parser/releases/latest), it will attempt to create the `./download/` and `./io/` folders in whichever directory you run the executable. On the first run, it creates the `./download/` files including this README. Then just copy your hg files to `./io/` and run the binary again. The text you see in the terminal should all be logged in the `./io/log.txt`. This should in theory also contain uncaught errors, in case something goes wrong.
 
-Though, I do recommend to just run the script in a python environment. The functions of the parser use standard libraries only. However, they rely on the included `nmssavetool.py`'s decompress function, which depends on the `lz4` package. You can ignore `pyInstall` in the `requirements.txt`, although it should do no harm when creating a venv.
+Though, I do recommend to just run the script in a python environment. The functions of the NMS_save_parser module use standard libraries only. However, they rely on the included `nmssavetool.py`'s decompress function, which depends on the `lz4` package. You can ignore `pyInstall` in the `requirements.txt`, although it should do no harm when creating a venv.
 
 ## If you are new to python
 
-Then the requirements section was probably some incomprehensible gibberish - Sorry for that. There are various IDEs for python, and VS Code may be a good choice to get started. More info on that one here:
+Then the last part of the above section was probably some incomprehensible gibberish - Sorry for that. There are various IDEs for python, and VS Code may be a good choice to get started. More info on that one here:
 
 https://code.visualstudio.com/docs/python/python-tutorial
 
@@ -83,8 +83,8 @@ In a nut shell:
 * get a clone (or download a zip) of the repository
 * open the (unzipped) folder in your IDE (e.g. in VS Code)
 * create a venv (e.g. Ctrl+Shift+P, create environment)
-* install packages there (e.g. `pip install` in a terminal)
-* run `__main__.py` (e.g. button or `py .` in a terminal)
+* install packages there (e.g. `pip install lz4` in a terminal)
+* run `__main__.py` (e.g. ▷ button or `py src` in a terminal)
 
 ## Inspirations and honourable mentions
 

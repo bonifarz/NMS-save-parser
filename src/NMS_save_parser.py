@@ -4,7 +4,7 @@ import json
 import csv
 from urllib.request import urlopen
 from datetime import datetime, timedelta
-# ... except for lzm, as required for the nmssavetool's decompress function
+# ... except for lz4, as required for the nmssavetool's decompress function
 from nmssavetool import readFile, writeFile, decompress
 
 class save_parser_class:
