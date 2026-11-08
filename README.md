@@ -31,7 +31,7 @@ for example `save3.hg.iHatePermaDeath.71180.inventoryslots.tsv`.
 
 This may be neat in case you want to compare different saves or their history. If you prefer another naming convention, the script should be easy to adapt.
 
-The script also generates json files that contain the full content of the save data. These are not necessary and their creation steps can be commented out.
+The script also appends its output to the logfile `./io/log.txt`, and generates json files that contain the full content of the save data. The latter two are not strictly necessary and their creation steps can be commented out.
 
 * `long.json` - full content of the save in a readable format,
 * `obfuscated.json` - for curiosity only, as explained in the next section.
@@ -51,7 +51,7 @@ This is where things get technical, but let us break it down here: The small scr
 
 ## File downloads
 
-The mappings mentioned above are not provided with the code here, but rather pulled from the above sources. The following files are kept in the `./download/` folder, so the content is only fetched  for a fresh install or to get an update (of any deleted file). Apart from the `mapping.json`, these are the following tabs of the *NMS Extracted Tables*,
+The mappings mentioned above are not provided with the code here, but rather pulled from the above sources. The following files are kept in the `./download/` folder, so the content is only fetched for a fresh install or to get an update (of any deleted file). This includes `csv` downloads of the following tabs of the *NMS Extracted Tables*,
 * `baseparts.csv`,
 * `baseobjects.csv`,
 * `consumables.csv`
@@ -61,6 +61,10 @@ The mappings mentioned above are not provided with the code here, but rather pul
 * `technology.csv`,
 
 which contain plenty of additional information, that may be useful for further custom scripting. Good stuff.
+
+The `download` files also include the mentioned `mapping.json` and a copy of this README.md file here. This ensures the information is readily available when running some pre-compiled binaries.
+
+If these files are kept, the script runs fine offline.
 
 ## Requirements and pre-compiled binaries
 

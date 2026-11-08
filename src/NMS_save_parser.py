@@ -10,26 +10,27 @@ from nmssavetool import readFile, writeFile, decompress
 class save_parser_class:
     """Wrap up the module in a class for ease of further development."""
 
-    def __init__(self):
-        """Get all mapping data first when an instance of the class created"""
-        os.makedirs("./download/", exist_ok=True)
-        print("loading definitions... to force a new donwload, just delete a file from ./download/")
+    def __init__(self, logger):
+        """When a new instance is created, take over the passed logger and load the mapping data."""
+        self.log = logger
+        self.log.info(100*"-")
+        self.log.info("loading definitions... to force a new download, just delete a file from ./download/")
+        self.get_readme()
         self.get_nms_tables()
         self.get_mapping()
 
     def parse_saves_from_io(self):
         """Process all hg files in the ./io/ folder."""
-        os.makedirs("./io/", exist_ok=True)
-        print("Checking for .hg files in this ./io/ folder ...")
+        self.log.info("Checking for .hg files in the ./io/ folder ...")
         for filename in os.listdir("./io/"):
             if filename.endswith(".hg"):
                 self.fn = "io/"+filename
                 self.parse_save()
-        print("All done.")
+        self.log.info("All done.\n")
 
     def parse_save(self):
         """Process one hg file at a time."""
-        print("decompressing and parsing the file ", self.fn)
+        self.log.info(f"decompressing and parsing the file {self.fn}")
         # once you have seen the result, you can comment out the below test line:
         writeFile(self.fn+".obfuscated.json", decompress(readFile(self.fn))) 
         # apply the name mapping to the decompressed save data:
@@ -49,7 +50,7 @@ class save_parser_class:
         f = open(fno, "w", encoding="ansi")
         f.write(json.dumps(self.save, indent=2))
         f.close
-        print(f"  ... done, full json dump written")
+        self.log.info(f"  ... done, full json dump written")
         
     def parse_bases(self):
         """Extract info about bases from one save into some tsv files."""
@@ -91,7 +92,7 @@ class save_parser_class:
 
         tsvreport.close()
         tsvdetail.close()
-        print(f"  ... parsed {basecount} bases with {totalparts} parts in total (global limit: 16'000 parts)")
+        self.log.info(f"  ... parsed {basecount} bases with {totalparts} parts in total (global limit: 16'000 parts)")
         
     def parse_inventory(self):
         """Extract info about inventories from one save into some tsv files."""
@@ -161,7 +162,7 @@ class save_parser_class:
 
         tsvreport.close()
         tsvdetail.close()
-        print(f"  ... parsed {self.itemcount} items in {self.stackcount} inventory slots including {self.techcount} installed tech")
+        self.log.info(f"  ... parsed {self.itemcount} items in {self.stackcount} inventory slots including {self.techcount} installed tech")
 
     def parse_discoveries(self):
         """Extract info about discoveries from one save into some tsv files."""
@@ -235,7 +236,7 @@ class save_parser_class:
 
         tsvreport.close()
         tsvdetail.close()
-        print(f"  ... parsed {totalcount} discoveries")
+        self.log.info(f"  ... parsed {totalcount} discoveries")
 
     def readable_timestamp(self, timestampint):
         """Convert integer timestamps from nms to a datetime value (UTC+0?)."""
@@ -250,6 +251,15 @@ class save_parser_class:
         # extract galaxy index, e.g. 0 for Euklid, 1 for Hilbert etc.
         self.galaxy = self.ua[4:6] 
 
+    def get_readme(self):
+        '''Download a recent "README.md" from this script's github.'''
+        
+        self.log.info("See the file ./download/README.md for further information")
+        if "README.md" not in os.listdir("./download/"):
+            self.log.info("  ... fetching a recent copy of the README from github")
+            u = urlopen("https://raw.githubusercontent.com/bonifarz/NMS-save-parser/refs/heads/main/README.md")
+            writeFile("download/README.md", u.read())
+
     def get_nms_tables(self):
         '''Get "nms extracted tables" from googledocs or from previous csv downloads.'''
         self.mapItemName=dict()
@@ -261,18 +271,18 @@ class save_parser_class:
         self.get_one_nms_table('substances', '66931870')
         self.get_one_nms_table('proctech', '1672062070')
         self.get_one_nms_table('technology', '874018846')
-        print("  ... item dictionaries created")
+        self.log.info("  ... item dictionaries created")
 
     def get_one_nms_table(self, sheetname, gid):
         '''Processes one nms extracted table at a time.'''
         try:
             f = open(f"download/{sheetname}.csv", newline='')
             r = csv.reader(f, delimiter=',') 
-            print(f"  ... using saved file ./download/{sheetname}.csv")
+            self.log.info(f"  ... using saved file ./download/{sheetname}.csv")
         except:
             sheet_id = "1J8WdrubKgo8A9hPY-hbQLq4eVrb3n3lZAgiI2J7ncAU"
             url = (f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid={gid}")
-            print(f"  ... fetching {sheetname} from ", url)
+            self.log.info(f"  ... fetching {sheetname} from {url}")
             u = urlopen(url)
             resp = u.read()
             writeFile(f"download/{sheetname}.csv",  resp)
@@ -291,16 +301,16 @@ class save_parser_class:
         '''Get the "mapping" from monkeyman192's github repo or from a previous json download.'''
         try:
             mappingfilestructure = json.load(open("download/mapping.json"))
-            print("  ... using saved file ./download/mapping.json")
+            self.log.info("  ... using saved file ./download/mapping.json")
         except:
             u = urlopen("https://github.com/monkeyman192/MBINCompiler/releases/latest/download/mapping.json")
             writeFile("download/mapping.json", u.read())
             mappingfilestructure = json.load(open("download/mapping.json"))
-            print("  ... written ./download/mapping.json as obtained from monkeyman192's github repo")
+            self.log.info("  ... written ./download/mapping.json as obtained from monkeyman192's github repo")
         self.mapping = dict()
         for i in mappingfilestructure["Mapping"]:
             self.mapping[i["Key"]] = i["Value"]
-        print("  ... save mapping dictionary created")
+        self.log.info("  ... save mapping dictionary created")
 
     def apply_mapping(self, shortsave):
         """Use the "mapping" in a custom hook to get a readable data structure from the obfuscated save data."""
