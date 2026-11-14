@@ -10,6 +10,7 @@ If you do not know where your saves are on windows, copy the below text and then
 ```
 %appdata%\HelloGames\NMS
 ```
+The folder with your saves also contains .hg files with the prefix `mf_`, like e.g. `mf_save03.hg`. You can ignore those, since they store just localisation data.
 
 ## File outputs
 
@@ -21,6 +22,7 @@ The script reads and transforms the save data to gather some statistics and deta
 * `inventoryslots.tsv` - all the items and installed tech they contain,
 * `discoveries.tsv` - stats from your discovery manager,
 * `discoverydata.tsv` - who discovered what, where and when in there.
+* `varia.tsv` - various attribute values in unpivoted form.
 
 The files can be imported to your favourite spreadsheet or BI software. Or simply put: Just copy-paste the text to work with the tables. Each of the above files is written (or overwritten) in the  `./io/` folder with the following prefixes, 
 * the input file name,
@@ -79,7 +81,7 @@ Then the last part of the above section was probably some incomprehensible gibbe
 https://code.visualstudio.com/docs/python/python-tutorial
 
 In a nut shell:
-* have pyhton and some IDE installed
+* have python and some IDE installed
 * get a clone (or download a zip) of the repository
 * open the (unzipped) folder in your IDE (e.g. in VS Code)
 * create a venv (e.g. Ctrl+Shift+P, create environment)
@@ -100,4 +102,4 @@ Cheers and happy exploring, DrBonifarz
 4. [NMSSaveEditor by goatfungus](https://github.com/goatfungus/NMSSaveEditor)
 5. [lenny009's NMS-Save-Decoder](https://github.com/NMSCD/NMS-Save-Decoder)
 6. [nms-weasel's base part count](https://github.com/weasel-nms/NMS-base-part-count/tree/main)
-7. [some example workflow by Rahul Suryavamshi, just in case](https://dev.to/rahul_suryash/steps-to-build-binary-executables-for-python-code-with-github-actions-4k92)
+7. [example git actions to compile and release some python binaries by Rahul Suryavamshi](https://dev.to/rahul_suryash/steps-to-build-binary-executables-for-python-code-with-github-actions-4k92)
