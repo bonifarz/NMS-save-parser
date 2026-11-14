@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Enter the version (e.g., v1.0.0)"
+        description: "Enter the version (e.g., V1.0.0)"
         required: true
 
 jobs:
@@ -19,8 +19,8 @@ jobs:
         env:
           VERSION: ${{ github.event.inputs.version }}
         run: |
-          if [[ ! "$VERSION" =~ ^V[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "Invalid version '$VERSION'. Expected format: v1.0.0"
+          if [[ ! "$VERSION" =~ ^V[0-9]+\.[0-9]+.* ]]; then
+            echo "Invalid version '$VERSION'. Expected format: V0.0..."
             exit 1
           fi
           if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
