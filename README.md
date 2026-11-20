@@ -1,16 +1,20 @@
 # NMS save parser
 
-This lightweight python script parses save data from NO MANS SKY (NMS) and extracts some tabular data in tsv format for further analysis.
+This lightweight python script decompresses and parses save data from No Man's Sky (NMS) and extracts some tabular data in tsv format for further analysis. You can think of its outputs as a small database of text files.
 
 ## File inputs
 
-This script will read any NMS saves (.hg files) that you copy to the `./io/` folder. This is not meant to edit or recompress any save data. You just copy the files for convenience of batch processing.
-
-If you do not know where your saves are on windows, copy the below text and then press Win+E, Ctrl+L, Ctrl+V, Enter.
+This script will read any NMS saves (.hg files) that you copy to the `./io/` folder. This is not meant to edit or recompress any save data. You just copy the files for convenience of batch processing. If you do not know where your saves are on windows, copy the below text and then press Win+E, Ctrl+L, Ctrl+V, Enter.
 ```
 %appdata%\HelloGames\NMS
 ```
-The folder with your saves also contains .hg files with the prefix `mf_`, like e.g. `mf_save03.hg`. You can ignore those, since they store just localisation data.
+The folder with your saves also contains .hg files with the prefix `mf_`, like e.g. `mf_save03.hg`. You can ignore those, since they store just some localisation data.
+
+## About release binaries
+
+If you just want to test the functionality of the script without installing python, you can get some binaries (e.g. an .exe file) from the latest [release download](https://github.com/bonifarz/NMS-save-parser/releases/latest). These are built using `pyInstall` and github actions. If you should decide to run such a binary file, it will attempt to create the folders `./download/` and `./io/` in whichever directory you run the executable. On the first run, it creates the `./download/` files including this `README.md`. Then just copy your hg files to `./io/` and run the binary again. The text you see in the terminal should all be logged in the `./io/log.txt`, including any uncaught errors, in case something goes wrong.
+
+Though, I do recommend to run the script in a python environment, as explained in a later section below. But before we get there, let us cover in more detail how the files in the two mentioned folders are generated.
 
 ## File outputs
 
@@ -21,8 +25,8 @@ The script reads and transforms the save data to gather some statistics and deta
 * `inventories.tsv` - stats about all your inventories,
 * `inventoryslots.tsv` - all the items and installed tech they contain,
 * `discoveries.tsv` - stats from your discovery manager,
-* `discoverydata.tsv` - who discovered what, where and when in there.
-* `varia.tsv` - various attribute values in unpivoted form.
+* `discoverydata.tsv` - who discovered what, where and when in there,
+* `varia.tsv` - various attributes of your fleet and tools in unpivoted form.
 
 The files can be imported to your favourite spreadsheet or BI software. Or simply put: Just copy-paste the text to work with the tables. Each of the above files is written (or overwritten) in the  `./io/` folder with the following prefixes, 
 * the input file name,
@@ -64,19 +68,15 @@ The mappings mentioned above are not provided with the code here, but rather pul
 
 which contain plenty of additional information, that may be useful for further custom scripting. Good stuff.
 
-The `download` files also include the mentioned `mapping.json` and a copy of this README.md file here. This ensures the information is readily available when running some pre-compiled binaries.
+The `download` files also include the mentioned `mapping.json` and a copy of this `README.md` file here. This ensures the information is readily available when running some pre-compiled binaries. If these files are kept, the script runs fine offline.
 
-If these files are kept, the script runs fine offline.
+## Python requirements
 
-## Requirements and release binaries
-
-If you just want to test the functionality of the script without installing python, you could try some binaries (e.g. .exe files) that were built using `pyInstall` and github actions. These come with no warranty whatsoever. If you should decide to run such a binary file from a [release download](https://github.com/bonifarz/NMS-save-parser/releases/latest), it will attempt to create the `./download/` and `./io/` folders in whichever directory you run the executable. On the first run, it creates the `./download/` files including this README. Then just copy your hg files to `./io/` and run the binary again. The text you see in the terminal should all be logged in the `./io/log.txt`. This should in theory also contain uncaught errors, in case something goes wrong.
-
-Though, I do recommend to just run the script in a python environment. The functions of the NMS_save_parser module use standard libraries only. However, they rely on the included `nmssavetool.py`'s decompress function, which depends on the `lz4` package. You can ignore `pyInstall` in the `requirements.txt`, although it should do no harm when creating a venv.
+The functions of the NMS_save_parser module use standard libraries only. However, they rely on the included `nmssavetool.py`'s decompress function, which depends on the `lz4` package. You can ignore `pyInstall` in the `requirements.txt`, although it should do no harm when creating a venv.
 
 ## If you are new to python
 
-Then the last part of the above section was probably some incomprehensible gibberish - Sorry for that. There are various IDEs for python, and VS Code may be a good choice to get started. More info on that one here:
+Then the above section was probably some incomprehensible gibberish - Sorry for that. There are various IDEs for python, and VS Code may be a good choice to get started. More info on that one here:
 
 https://code.visualstudio.com/docs/python/python-tutorial
 

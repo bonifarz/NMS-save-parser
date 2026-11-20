@@ -38,17 +38,29 @@ class save_parser_class:
         try:
             self.save = self.apply_mapping(decompress(readFile(self.fn)))
         except:
-            self.log.info("  ... file skipped, not valid save for our mappings.")
+            self.log.info("  ... file skipped, not a valid save for our mappings.")
             return
         self.write_save_json()
         # define the prefixes for all following output files below:
         self.fn += "."+self.save["CommonStateData"]["SaveName"]
         self.fn += "."+str(self.save["CommonStateData"]["TotalPlayTime"])
         # here you can select (and add your own) data parsing steps as needed:
-        self.parse_inventory()
-        self.parse_bases()
-        self.parse_discoveries()
-        self.parse_varia()
+        try:
+            self.parse_inventory()
+        except Exception as e:
+            self.log.error(f"   !  inventory parsing error: {repr(e)}")
+        try:
+            self.parse_bases()
+        except Exception as e:
+            self.log.error(f"   !  base parsing error: {repr(e)}")
+        try:
+            self.parse_discoveries()
+        except Exception as e:
+            self.log.error(f"   !  discovery parsing error: {repr(e)}")
+        try:
+            self.parse_varia()
+        except Exception as e:
+            self.log.error(f"   !  varia parsing error: {repr(e)}")
 
     def write_save_json(self):
         """Store the save data in a long json format."""
@@ -62,12 +74,12 @@ class save_parser_class:
         """Extract info about bases from one save into some tsv files."""
         tsvreport = open(self.fn+".bases.tsv", 'w', newline='', encoding='utf-8')
         report = csv.writer(tsvreport, delimiter='\t') #  delimiter='\t')
-        report.writerow(["GalacticAddress", "RId", f"{"Glpyhs":14}", f"{"LastUpdateTimestamp":22}", f"{"Objects":5}",
+        report.writerow(["GalacticAddress", "RID", f"{"Glpyhs":14}", f"{"LastUpdateTimestamp":22}", f"{"Objects":5}",
                          f"{"PosR":>9}", f"{"PosNS":>7}", f"{"PosEW":>7}", f"{"BaseType":18}", "BaseName"])
 
         tsvdetail = open(self.fn+".baseparts.tsv", 'w', newline='', encoding='utf-8')
         detail = csv.writer(tsvdetail, delimiter='\t')
-        detail.writerow([f"{"partId":20}", f"{"partName":30}", f"{"xPos":>10}", f"{"yPos":>10}", f"{"zPos":>10}", 
+        detail.writerow([f"{"PartId":20}", f"{"PartName":30}", f"{"PosX":>10}", f"{"PosY":>10}", f"{"PosZ":>10}", 
                          f"{"Timestamp":>22}", "BaseName"])
 
         bases = self.save["BaseContext"]["PlayerStateData"]["PersistentPlayerBases"]
@@ -85,9 +97,10 @@ class save_parser_class:
             y = k["Position"][1]
             z = k["Position"][2]
             x2py2 = x*x+y*y
-            posR =  f"{np.sqrt(x2py2 + z*z):9.1f}"  # planet size + altitude 
+            posR =  f"{np.sqrt(x2py2 + z*z):9.1f}"  # distance ~ planet size + altitude
             posNS = f"{np.atan2(z, np.sqrt(x2py2))*180/np.pi:7.2f}"  # theta in °
             posEW = f"{np.atan2(y,x)*180/np.pi:7.2f}" # phi in °
+            #note: For off-planet coordinates, the above are with respect to the space station
             match btype:
                 case "ChestMagicInventory":
                     name = 'DeletedBaseCache'
@@ -123,8 +136,8 @@ class save_parser_class:
 
         tsvdetail = open(self.fn+".inventoryslots.tsv", 'w', newline='', encoding='utf-8')
         detail = csv.writer(tsvdetail, delimiter='\t')
-        detail.writerow([f"{"x":2}", f"{"y":2}", f"{"Amount":8}", f"{"id":20}", f"{"seed":10}",  
-                         f"{"itemName":30}", f"{"itemCtg":20}", f"{"InventoryType":30}", "InventoryName"])
+        detail.writerow([f"{"X":2}", f"{"Y":2}", f"{"Amount":8}", f"{"ID":20}", f"{"Seed":10}",  
+                         f"{"ItemName":30}", f"{"ItemCtg":20}", f"{"InventoryType":30}", "InventoryName"])
 
         self.itemcount = 0
         self.stackcount = 0
@@ -176,9 +189,10 @@ class save_parser_class:
             parse_slots(s["Inventory"]["Slots"], "ShipInventory", s["Name"])
             parse_slots(s["Inventory_TechOnly"]["Slots"], "ShipTech", s["Name"])
 
-        for s in (self.save["BaseContext"]["PlayerStateData"]["VehicleOwnership"]):
-            parse_slots(s["Inventory"]["Slots"], "ExocraftInventory", s["Name"])
-            parse_slots(s["Inventory_TechOnly"]["Slots"], "ExocraftTech", s["Name"])
+        exo = ["Roamer ", "Nomad ", "Colossus ", "Pilgrim ", "ExoStub?", "Nautilus ", "Minotaur "]
+        for k, v in enumerate(self.save["BaseContext"]["PlayerStateData"]["VehicleOwnership"]):
+            parse_slots(v["Inventory"]["Slots"], "ExocraftInventory", exo[k]+v["Name"])
+            parse_slots(v["Inventory_TechOnly"]["Slots"], "ExocraftTech", exo[k]+v["Name"])
 
         for s in (self.save["BaseContext"]["PlayerStateData"]["Multitools"]):
             parse_slots(s["Store"]["Slots"], "MultitoolTech", s["Name"])
@@ -191,11 +205,12 @@ class save_parser_class:
         """Extract info about discoveries from one save into some tsv files."""
         tsvreport = open(self.fn+".discoveries.tsv", 'w', newline='', encoding='utf-8')
         report = csv.writer(tsvreport, delimiter='\t')
-        report.writerow([" stored", "renamed", "   mine", "mynamed", "pending", f"{"dtype":20}"])
+        report.writerow([" Stored", "Renamed", "   Mine", "MyNamed", "Pending", f"{"DType":20}"])
 
         tsvdetail = open(self.fn+".discoverydata.tsv", 'w', newline='', encoding='utf-8')
         detail = csv.writer(tsvdetail, delimiter='\t')
-        detail.writerow([f"{"ua":14}", "RId", f"{"glyphs":12}", f"{"timeStamp":22}", f"{"dtype":20}", "newName", "by"])
+        detail.writerow(["GalacticAddress", "RID", f"{"Glyphs":12}", f"{"TimeStamp":22}", 
+                         f"{"Seed0":20}", f"{"DType":20}", "NewName", "By"])
         
         totalcount = 0
         subcount = dict()
@@ -207,6 +222,7 @@ class save_parser_class:
         
         for r in (self.save["DiscoveryManagerData"]["DiscoveryData-v1"]["Store"]["Record"]):
             dtype = r["DD"]["DT"]
+            seed0 =  f"{r["DD"]["VP"][0]:<20}" if "VP" in r["DD"] else f"{"N/A":<20}"
             byID = r["OWS"]["UID"]
             by = r["OWS"]["USN"]
             try: 
@@ -215,37 +231,23 @@ class save_parser_class:
                 newName = "none"
             timeStamp = self.readable_timestamp(r["OWS"]["TS"])
             self.parse_galactic_address(r["DD"]["UA"])
-            detail.writerow([self.ua, self.galaxy, self.glyphs, timeStamp, f"{dtype:20}", newName, by])
+            detail.writerow([self.ua, self.galaxy, self.glyphs, timeStamp, seed0, f"{dtype:20}", newName, by])
             totalcount += 1
-            try:
-                subcount[dtype] += 1
-            except:
-                subcount[dtype] = 1
+            subcount[dtype] = subcount[dtype]+1 if dtype in subcount else 1
             if newName != "none" and newName != "":
-                try:
-                    namedcount[dtype] += 1
-                except:
-                    namedcount[dtype] = 1
+                namedcount[dtype] = namedcount[dtype]+1 if dtype in namedcount else 1
             if byID == myID:
-                try:
-                    mycount[dtype] += 1
-                except:
-                    mycount[dtype] = 1
+                mycount[dtype] = mycount[dtype]+1 if  dtype in mycount else 1
             if byID == myID and newName != "none" and newName != "":
-                try:
-                    mynamedcount[dtype] += 1
-                except:
-                    mynamedcount[dtype] = 1
+                mynamedcount[dtype] = mynamedcount[dtype]+1 if dtype in mynamedcount else 1
 
         for r in (self.save["DiscoveryManagerData"]["DiscoveryData-v1"]["Available"]):
             dtype = r["DD"]["DT"]
+            seed0 =  f"{r["DD"]["VP"][0]:<20}"
             timeStamp = self.readable_timestamp(r["TSrec"])
             self.parse_galactic_address(r["DD"]["UA"])
-            detail.writerow([self.ua, self.galaxy, self.glyphs, timeStamp, f"{dtype:20}", "none", "minePendingUpload"]) 
-            try:
-                pendingcount[dtype] += 1
-            except:
-                pendingcount[dtype] = 1
+            detail.writerow([self.ua, self.galaxy, self.glyphs, timeStamp, seed0, f"{dtype:20}", "None", "MinePendingUpload"]) 
+            pendingcount[dtype] = pendingcount[dtype]+1 if dtype in pendingcount else 1
 
         for dtype in subcount:
             report.writerow([
@@ -261,7 +263,6 @@ class save_parser_class:
         tsvdetail.close()
         self.log.info(f"  ... parsed {totalcount} discoveries")
 
-
     def parse_varia(self):
         """Extract various attribute values in unpivoted form."""
         tsvdetail = open(self.fn+".varia.tsv", 'w', newline='', encoding='utf-8')
@@ -273,45 +274,59 @@ class save_parser_class:
             n = f"{"Unnamed" if obj["Name"] == "" else obj["Name"]:30}" 
             t = f"{type:20}"
             r = obj["Resource"]["Filename"].replace(".SCENE.MBIN", "").replace("MODELS/COMMON/", "")
-            if r != "": detail.writerow([t, n, f"{"Resource":20}", r])
-            try:
-                detail.writerow([t, n, f"{"class":20}",  obj["Inventory"]["Class"]["InventoryClass"]])
-            except:
-                pass
-            try:
-                detail.writerow([t, n, f"{"class":20}",  obj["Store"]["Class"]["InventoryClass"]])
-            except:
-                pass
-            try:
-                for a in obj["Inventory"]["BaseStatValues"]:
-                    detail.writerow([t, n, f"{a["BaseStatID"]:20}", a["Value"]])
-            except:
-                pass
-            try:
-                for a in obj["Store"]["BaseStatValues"]:
-                    detail.writerow([t, n, f"{a["BaseStatID"]:20}", a["Value"]])
-            except:
-                pass
+            if r == "": return 0
+            s = f"{obj["Seed"][1]:<15}" if "Seed" in obj else ""
+            s = f"{obj["Resource"]["Seed"][1]:<15}" if "Seed" in obj["Resource"] else s
+            detail.writerow([t, n, f"{"Resource":20}", r])
+            if s != "": detail.writerow([t, n, f"{"Seed1":20}", s])
+
+            for i in obj:
+                if i in ["Inventory", "Store"]:
+                    detail.writerow([t, n, f"{"Class":20}",  obj[i]["Class"]["InventoryClass"]])
+                    for a in obj[i]["BaseStatValues"]:
+                        detail.writerow([t, n, f"{a["BaseStatID"]:20}", a["Value"]])
             return 1
 
         for s in (self.save["BaseContext"]["PlayerStateData"]["ShipOwnership"]):
-            subjects += parse_ship_or_tool(s, "activeShip")
+            subjects += parse_ship_or_tool(s, "ActiveShip")
         
         for s in (self.save["BaseContext"]["PlayerStateData"]["ArchivedShipOwnership"]):
-            subjects += parse_ship_or_tool(s["Ownership"], "archivedShip")
+            subjects += parse_ship_or_tool(s["Ownership"], "ArchivedShip")
 
         for s in (self.save["BaseContext"]["PlayerStateData"]["Multitools"]):
-            subjects += parse_ship_or_tool(s, "activeTool")
+            subjects += parse_ship_or_tool(s, "ActiveTool")
 
         for s in (self.save["BaseContext"]["PlayerStateData"]["ArchivedMultitools"]):
-            subjects += parse_ship_or_tool(s["MultitoolData"], "archivedTool")
-            
+            subjects += parse_ship_or_tool(s["MultitoolData"], "ArchivedTool")
+
+        s = {#wrap up the freighter attributes, so we can parse it like ships and tools
+            "Name": self.save["BaseContext"]["PlayerStateData"]["PlayerFreighterName"],
+            "Seed": self.save["BaseContext"]["PlayerStateData"]["CurrentFreighter"]["Seed"],
+            "Resource":{
+                "Filename": self.save["BaseContext"]["PlayerStateData"]["CurrentFreighter"]["Filename"]},
+            "Inventory": self.save["BaseContext"]["PlayerStateData"]["FreighterInventory"]}
+        subjects += parse_ship_or_tool(s, "Freighter")
+
+        t = f"{'frigate':20}"
+        for s in (self.save["BaseContext"]["PlayerStateData"]["FleetFrigates"]):
+            subjects += 1
+            n = f"{"Unnamed" if s["CustomName"] == "" else s["CustomName"]:30}"
+            detail.writerow([t, n, f"{"Seed1":20}",  s["ResourceSeed"][1]])
+            detail.writerow([t, n, f"{"Class":20}",  s["InventoryClass"]["InventoryClass"]])
+            detail.writerow([t, n, f"{"Type":20}",  s["FrigateClass"]["FrigateClass"]])
+            for k, v in enumerate(
+                ["Combat", "Exploration", "Mining", "Trade", 
+                 "FuelCost", "GuelGain", "Speed", "Invis", "Unknown", "Resistance"]):
+                detail.writerow([t, n, f"{v:20}",  s["Stats"][k]])
+            for k, v in enumerate(s["TraitIDs"]):
+                detail.writerow([t, n, f"TraitID{k:<13}",  v])
+                   
         #tsvreport.close() # no point in creating a summary of those (yet)
         tsvdetail.close()
         self.log.info(f"  ... parsed various attributes of {subjects} subjects")
 
     def readable_timestamp(self, timestampint):
-        """Convert integer timestamps from nms to a datetime value (UTC+0?)."""
+        """Convert integer timestamps from nms to a datetime value (UTC+0)."""
         return f"{datetime(1970, 1, 1, 0, 0, 0) + timedelta(seconds=timestampint)}:22"
 
     def parse_galactic_address(self, hexorint):
@@ -325,7 +340,6 @@ class save_parser_class:
 
     def get_readme(self):
         '''Download a recent "README.md" from this script's github.'''
-        
         self.log.info("See the file ./download/README.md for further information")
         if "README.md" not in os.listdir("./download/"):
             self.log.info("  ... fetching a recent copy of the README from github")

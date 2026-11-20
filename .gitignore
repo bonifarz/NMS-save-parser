@@ -4,5 +4,9 @@ __pycache__/
 bak/
 io/
 download/
+
+#only for local pyInstall tests
 build/
 dist/
+
+#otherwise, keep it minimalistic
